@@ -37,7 +37,7 @@ const onFormSubmit = ({ valid }) => {
   }
 }
 
-const tags = ref([{ name: 'Работа' }, { name: 'Учёба' }, { name: 'Повседневное' }, { name: 'Личное' }, { name: 'Путешествия' }, { name: 'Другое' }])
+const tags = ref([{ name: 'Работа', color: 'secondary' }, { name: 'Учёба', color: 'success' }, { name: 'Повседневное', color: 'info' }, { name: 'Личное', color: "warn" }, { name: 'Путешествия', color: 'danger' }, { name: 'Другое', color: 'contrast' }])
 </script>
 <template>
   <Form v-slot="$form" :resolver @submit="onFormSubmit" class="w-full p-3 flex flex-col border-1 gap-4 border-gray-200">
