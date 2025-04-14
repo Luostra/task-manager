@@ -32,37 +32,19 @@ const onFormSubmit = (e) => {
 }
 </script>
 <template>
-  <div
-    class="flex flex-col bg-[url('../assets/patternCode.jpg')] bg-[length:65%_auto] lg:bg-[length:25%_auto] bg-repeat w-full min-h-lvh h-full"
-  >
+  <div class="flex flex-col bg-[url('../assets/patternCode.jpg')] bg-[length:65%_auto] lg:bg-[length:25%_auto] bg-repeat w-full min-h-lvh h-full">
     <div class="flex-1 w-full bg-gray-500/20">
-      <div
-        class="w-full max-w-150 mx-auto min-h-min bg-white/85 backdrop-blur-sm rounded-lg mb-10 mt-30 shadow-xl"
-      >
+      <div class="w-full max-w-150 mx-auto min-h-min bg-white/85 backdrop-blur-sm rounded-lg mb-10 mt-30 shadow-xl">
         <div class="">
           <h1 class="font-medium text-2xl text-gray-500 text-center pt-4">Вход в учётную запись</h1>
-          <p class="font-medium text-sm text-gray-500 text-center pt-2">
-            Войдите в аккаунт, чтобы вернуться к Вашим задачам:
-          </p>
-          <Form
-            v-slot="$form"
-            :initialValues
-            :resolver
-            @submit="onFormSubmit"
-            class="flex flex-col gap-4 w-full mx-auto max-w-148 p-4"
-          >
+          <p class="font-medium text-sm text-gray-500 text-center pt-2">Войдите в аккаунт, чтобы вернуться к Вашим задачам:</p>
+          <Form v-slot="$form" :initialValues :resolver @submit="onFormSubmit" class="flex flex-col gap-4 w-full mx-auto max-w-148 p-4">
             <div class="flex flex-col gap-1">
               <FloatLabel variant="in" class="">
                 <InputText name="username" type="text" fluid />
                 <label for="username">Имя пользователя</label>
               </FloatLabel>
-              <Message
-                v-if="$form.username?.invalid"
-                severity="error"
-                size="small"
-                variant="simple"
-                >{{ $form.username.error.message }}</Message
-              >
+              <Message v-if="$form.username?.invalid" severity="error" size="small" variant="simple">{{ $form.username.error.message }}</Message>
             </div>
             <div class="flex flex-col gap-1">
               <FloatLabel variant="in" class="">
@@ -70,12 +52,7 @@ const onFormSubmit = (e) => {
                 <label for="password">Пароль</label>
               </FloatLabel>
 
-              <Message
-                v-if="$form.password?.invalid"
-                severity="error"
-                size="small"
-                variant="simple"
-              >
+              <Message v-if="$form.password?.invalid" severity="error" size="small" variant="simple">
                 <ul class="my-0 flex flex-col gap-1">
                   <li v-for="(error, index) of $form.password.errors" :key="index">
                     {{ error.message }}
