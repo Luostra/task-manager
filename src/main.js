@@ -8,6 +8,7 @@ import router from './router'
 
 import PrimeVue from 'primevue/config'
 import Aura from '@primevue/themes/aura'
+import AnimateOnScroll from 'primevue/animateonscroll';
 
 const app = createApp(App)
 
@@ -19,5 +20,5 @@ app.use(PrimeVue, {
         preset: Aura,
     },
 })
-
+app.directive('animateonscroll', AnimateOnScroll);
 app.mount('#app')
