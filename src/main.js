@@ -8,7 +8,7 @@ import router from './router'
 
 import PrimeVue from 'primevue/config'
 import Aura from '@primevue/themes/aura'
-import AnimateOnScroll from 'primevue/animateonscroll';
+import AnimateOnScroll from 'primevue/animateonscroll'
 
 const app = createApp(App)
 
@@ -16,9 +16,9 @@ app.use(createPinia())
 app.use(router)
 
 app.use(PrimeVue, {
-    theme: {
-        preset: Aura,
-    },
+  theme: {
+    preset: Aura,
+  },
 })
-app.directive('animateonscroll', AnimateOnScroll);
+app.directive('animateonscroll', AnimateOnScroll)
 app.mount('#app')

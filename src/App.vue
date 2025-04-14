@@ -36,14 +36,7 @@ const items = ref([
     }"
   >
     <template #start>
-      <img
-        width="115"
-        height="35"
-        viewBox="0 0 115 35"
-        fill="none"
-        src="./assets/logoFull.png"
-        class=""
-      />
+      <img width="115" height="35" viewBox="0 0 115 35" fill="none" src="./assets/logoFull.png" class="" />
     </template>
     <template #item="{ item, props }">
       <a class="flex items-center" v-bind="props.action">
@@ -62,4 +55,3 @@ const items = ref([
 </template>
 
 <style scoped></style>
-
