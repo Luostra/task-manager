@@ -1,8 +1,9 @@
 <script setup>
 import { ref, computed } from 'vue'
 import CreateTask from '@/components/CreateTask.vue'
-import { Panel, Button, ToggleButton, Checkbox, Menu, Tag } from 'primevue'
+import { Panel, Button, ToggleButton, Checkbox, Menu, Tag, Dialog, InputText, Message, Textarea, FloatLabel, DatePicker, MultiSelect, Rating } from 'primevue'
 import { format } from 'date-fns'
+import { z } from 'zod'
 let id = 0
 
 const addTodo = (value) => {
@@ -29,6 +30,18 @@ const filteredTodos = computed(() => {
 function removeTodo(todo) {
   todos.value = todos.value.filter((t) => t !== todo)
 }
+
+const isEditDialogVisible = ref(false);
+
+let today = new Date()
+const tags = ref([
+  { name: 'Работа' },
+  { name: 'Учёба' },
+  { name: 'Повседневное' },
+  { name: 'Личное' },
+  { name: 'Путешествия' },
+  { name: 'Другое' },
+])
 </script>
 <template>
   <CreateTask @form-submited="addTodo" />
@@ -85,6 +98,75 @@ function removeTodo(todo) {
           </template>
           <template #icons>
             <Button icon="pi pi-trash" severity="danger" rounded text @click="removeTodo(todo)" />
+            <Button icon="pi pi-pencil" rounded text @click="isEditDialogVisible = true" />
+            
+            <Dialog v-model:visible="isEditDialogVisible" modal header="Изменить задачу" :style="{ width: '25rem' }" pt:mask:class="backdrop-blur-sm backdrop-brightness-100" class="!max-h-145">
+                <span class="text-surface-500 dark:text-surface-400 block mb-8">Обновите информацию и закройте окно</span>
+                <div class="flex items-center gap-4 mb-4">
+                  <FloatLabel variant="in" class="w-full">
+                    <InputText
+                      name="newTask"
+                      id="new_task"
+                      type="text"
+                      class="w-full h-full"
+                      v-model="todo.name"
+                      :defaultValue=todo.name
+                    />
+                    <label for="new_task">Название задачи</label>
+                  </FloatLabel>
+                </div>
+                <div class="flex items-center gap-4 mb-4">
+                  <FloatLabel variant="in" class="w-full">
+                    <DatePicker
+                      v-model="todo.time"
+                      :minDate="today"
+                      :manualInput="false"
+                      :defaultValue="todo.time"
+                      showIcon
+                      iconDisplay="input"
+                      class="w-full"
+                      showButtonBar
+                    />
+                    <label for="date">Выполнить до</label>
+                  </FloatLabel>
+                </div>
+                <div class="flex items-center gap-4 mb-4">
+                  <FloatLabel variant="in" class="w-full">
+                    <MultiSelect
+                      id="tags"
+                      v-model="todo.tags"
+                      :defaultValue="todo.tags"
+                      :options="tags"
+                      optionLabel="name"
+                      filter
+                      :maxSelectedLabels="3"
+                      class="w-35 md:w-full"
+                      variant="filled"
+                    />
+                    <label for="tags">Теги</label>
+                  </FloatLabel>
+                </div>
+                <div class="flex items-center gap-4 mb-4">
+                  <div class="flex 1 mx-auto gap-2">
+                    <p class="text-sm md:text-base font-medium text-gray-500">Приоритет:</p>
+                    <Rating v-model="todo.rating" :defaultValue="todo.rating" />
+                  </div>
+                </div>
+                <div class="flex items-center gap-4 mb-4">
+                  <FloatLabel variant="on" class="w-full">
+                    <Textarea
+                      name="taskDescription"
+                      id="task_description"
+                      class="w-full"
+                      style="resize: none"
+                      rows="4"
+                      v-model="todo.description"
+                      :defaultValue="todo.description"
+                    />
+                    <label for="task_description">Описание</label>
+                  </FloatLabel>
+                </div>
+            </Dialog>
             <Menu ref="menu" id="config_menu" popup />
           </template>
           <div class="flex flex-col gap-1">
