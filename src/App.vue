@@ -45,11 +45,15 @@ const { logout } = authStore
     </template>
     <template #item="{ item, props }">
       <a class="flex items-center" v-bind="props.action">
-        <RouterLink :to="item.path" v-if="item.label != 'Войти'">
+        <RouterLink :to="item.path" v-if="isAuthenticated && item.label != 'Войти'">
           <span :class="item.icon" />
           <span class="pl-1">{{ item.label }}</span>
         </RouterLink>
         <RouterLink :to="item.path" v-if="!isAuthenticated && item.label == 'Войти'">
+          <span :class="item.icon" />
+          <span class="pl-1">{{ item.label }}</span>
+        </RouterLink>
+        <RouterLink :to="item.path" v-if="!isAuthenticated && item.label == 'О программе'">
           <span :class="item.icon" />
           <span class="pl-1">{{ item.label }}</span>
         </RouterLink>
