@@ -16,7 +16,7 @@ const addTodo = (value) => {
     tags: value.tags,
     done: false,
   })
-  console.log(value)
+  console.log(todos)
   value = ''
 }
 
@@ -34,7 +34,14 @@ function removeTodo(todo) {
 const isEditDialogVisible = ref(false)
 
 let today = new Date()
-const tags = ref([{ name: 'Работа', color: 'secondary' }, { name: 'Учёба', color: 'success' }, { name: 'Повседневное', color: 'info' }, { name: 'Личное', color: 'warn' }, { name: 'Путешествия', color: 'danger' }, { name: 'Другое', color: 'contrast' }])
+const tags = ref([
+  { name: 'Работа', color: 'secondary' },
+  { name: 'Учёба', color: 'success' },
+  { name: 'Повседневное', color: 'info' },
+  { name: 'Личное', color: 'warn' },
+  { name: 'Путешествия', color: 'danger' },
+  { name: 'Другое', color: 'contrast' },
+])
 </script>
 <template>
   <CreateTask @form-submited="addTodo" />
@@ -117,7 +124,7 @@ const tags = ref([{ name: 'Работа', color: 'secondary' }, { name: 'Учё�
               <h1 class="font-medium text-gray-500">{{ todo.tags ? 'Теги:' : '' }}</h1>
               <ul class="flex flex-row gap-2">
                 <li v-for="tag in todo.tags">
-                  <Tag :severity=tag.color rounded>{{ tag.name }}</Tag>
+                  <Tag :severity="tag.color" rounded>{{ tag.name }}</Tag>
                 </li>
               </ul>
             </div>
