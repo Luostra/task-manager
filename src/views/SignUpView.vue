@@ -14,6 +14,7 @@ const initialValues = ref({
   username: '',
   password: '',
   items: [],
+  tasksId: 0,
 })
 
 const resolver = zodResolver(

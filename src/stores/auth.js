@@ -3,7 +3,10 @@ import { defineStore } from 'pinia'
 
 export const useAuthStore = defineStore('auth', () => {
   // Состояние
-  const user = ref(JSON.parse(localStorage.getItem('user'))  || { items: [] })
+  const user = ref(JSON.parse(localStorage.getItem('user')) || { 
+    items: [],
+    tasksId: 0 // Добавляем поле для хранения максимального ID
+  })
   const isAuthenticated = computed(() => !!user.value)
 
   // Действия
@@ -36,9 +39,24 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem('user', JSON.stringify(user.value))
   }
   
-  const replaceItems = (newArray) => {
-    user.value.items = [...newArray]; // Создаем новый массив
-    saveUser(); // Сохраняем изменения
+  const replaceItems = (newArray) => { // добавить обновление id
+    if (!Array.isArray(newArray)) {
+      console.error('Метод replaceItems ожидает массив в качестве аргумента')
+      return
+    }
+  
+    // Обновляем массив items
+    user.value.items = [...newArray]
+  
+    // Вычисляем новый maxId
+    if (newArray.length === 0) {
+      user.value.tasksId = 0 // Если массив пуст, сбрасываем maxId
+    } else {
+      // Находим максимальный ID среди всех элементов
+      user.value.tasksId = Math.max(...newArray.map(item => item?.id ?? 0))
+    }
+  
+    saveUser() // Сохраняем изменени
   }
 
   return {
