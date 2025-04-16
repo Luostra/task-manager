@@ -4,6 +4,13 @@ import CreateTask from '@/components/CreateTask.vue'
 import { Panel, Button, ToggleButton, Checkbox, Menu, Tag, Dialog, InputText, Message, Textarea, FloatLabel, DatePicker, MultiSelect, Rating } from 'primevue'
 import { format } from 'date-fns'
 import { z } from 'zod'
+import { useAuthStore } from '@/stores/auth'
+import { storeToRefs } from 'pinia'
+
+const authStore = useAuthStore()
+const { user } = storeToRefs(authStore)
+const items = user.value.items // Реактивная ссылка на массив
+
 let id = 0
 
 const addTodo = (value) => {
@@ -16,12 +23,12 @@ const addTodo = (value) => {
     tags: value.tags,
     done: false,
   })
-  console.log(todos)
+  authStore.replaceItems(todos.value)
   value = ''
 }
 
 const hideCompleted = ref(false)
-const todos = ref([])
+const todos = ref(items)
 
 const filteredTodos = computed(() => {
   return hideCompleted.value ? todos.value.filter((t) => !t.done) : todos.value
@@ -42,6 +49,11 @@ const tags = ref([
   { name: 'Путешествия', color: 'danger' },
   { name: 'Другое', color: 'contrast' },
 ])
+const selectedCard = ref(null)
+const selectCard = (card) => {
+  isEditDialogVisible.value = true
+  selectedCard.value = card
+}
 </script>
 <template>
   <CreateTask @form-submited="addTodo" />
@@ -82,13 +94,13 @@ const tags = ref([
           </template>
           <template #icons>
             <Button icon="pi pi-trash" severity="danger" rounded text @click="removeTodo(todo)" />
-            <Button icon="pi pi-pencil" rounded text @click="isEditDialogVisible = true" />
+            <Button icon="pi pi-pencil" rounded text @click="selectCard(todo)" />
 
             <Dialog v-model:visible="isEditDialogVisible" modal header="Изменить задачу" :style="{ width: '25rem' }" pt:mask:class="backdrop-blur-sm backdrop-brightness-100" class="!max-h-145">
               <span class="text-surface-500 dark:text-surface-400 block mb-8">Обновите информацию и закройте окно</span>
               <div class="flex items-center gap-4 mb-4">
                 <FloatLabel variant="in" class="w-full">
-                  <InputText name="newTask" id="new_task" type="text" class="w-full h-full" v-model="todo.name" :defaultValue="todo.name" />
+                  <InputText name="newTask" id="new_task" type="text" class="w-full h-full" v-model="todo.name" :defaultValue="selectedCard.name" />
                   <label for="new_task">Название задачи</label>
                 </FloatLabel>
               </div>

@@ -13,6 +13,7 @@ const router = useRouter()
 const initialValues = ref({
   username: '',
   password: '',
+  items: [],
 })
 
 const resolver = zodResolver(

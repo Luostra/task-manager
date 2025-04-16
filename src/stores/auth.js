@@ -8,15 +8,14 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Действия
   const register = (userData) => {
-    // В реальном приложении здесь был бы запрос к API
     const newUser = {
       id: Date.now(),
+      items: [],  // Добавляем пустой массив при регистрации
       ...userData
     }
     user.value = newUser
-    localStorage.setItem('user', JSON.stringify(newUser))
+    saveUser()
   }
-
   const login = (credentials) => {
     // В реальном приложении здесь была бы проверка с сервером
     // Для демо просто проверяем наличие пользователя в localStorage
@@ -33,11 +32,21 @@ export const useAuthStore = defineStore('auth', () => {
     //localStorage.removeItem('user')
   }
 
+  const saveUser = () => {
+    localStorage.setItem('user', JSON.stringify(user.value))
+  }
+  
+  const replaceItems = (newArray) => {
+    user.value.items = [...newArray]; // Создаем новый массив
+    saveUser(); // Сохраняем изменения
+  }
+
   return {
     user,
     isAuthenticated,
     register,
     login,
     logout,
+    replaceItems,
   }
 })
