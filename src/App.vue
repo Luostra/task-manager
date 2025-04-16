@@ -2,6 +2,8 @@
 import { RouterLink, RouterView } from 'vue-router'
 import { Button, Menubar } from 'primevue'
 import { ref } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { storeToRefs } from 'pinia'
 //    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
 const items = ref([
   {
@@ -20,6 +22,9 @@ const items = ref([
     path: '/login',
   },
 ])
+const authStore = useAuthStore()
+const { isAuthenticated } = storeToRefs(authStore)
+const { logout } = authStore
 </script>
 
 <template>
@@ -40,15 +45,20 @@ const items = ref([
     </template>
     <template #item="{ item, props }">
       <a class="flex items-center" v-bind="props.action">
-        <RouterLink :to="item.path">
+        <RouterLink :to="item.path" v-if="item.label != 'Войти'">
           <span :class="item.icon" />
           <span class="pl-1">{{ item.label }}</span>
         </RouterLink>
+        <RouterLink :to="item.path" v-if="!isAuthenticated && item.label == 'Войти'">
+          <span :class="item.icon" />
+          <span class="pl-1">{{ item.label }}</span>
+        </RouterLink>
+        <RouterLink to="/login">
+          <Button unstyled="" label="  Выйти" @click="logout" text icon="pi pi-sign-out" severity="danger" v-if="isAuthenticated && item.label == 'Войти'"></Button>
+        </RouterLink>
       </a>
     </template>
-    <template #end>
-      <div class="flex items-center gap-2"></div>
-    </template>
+    <template #end> </template>
   </Menubar>
 
   <RouterView />

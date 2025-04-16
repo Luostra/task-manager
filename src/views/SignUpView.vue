@@ -4,11 +4,17 @@ import { zodResolver } from '@primevue/forms/resolvers/zod'
 import { z } from 'zod'
 import { Button, InputText, Password, Message, FloatLabel } from 'primevue'
 import { Form } from '@primevue/forms'
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
+const router = useRouter()
 
 const initialValues = ref({
   username: '',
   password: '',
+  items: [],
+  tasksId: 0,
 })
 
 const resolver = zodResolver(
@@ -40,6 +46,8 @@ const onFormSubmit = (e) => {
 
   if (e.valid) {
     console.log(initialValues.value)
+    authStore.register(initialValues.value)
+    router.push('/')
   }
 }
 </script>
@@ -53,14 +61,14 @@ const onFormSubmit = (e) => {
           <Form v-slot="$form" :initialValues :resolver @submit="onFormSubmit" class="flex flex-col gap-4 w-full mx-auto max-w-148 p-4">
             <div class="flex flex-col gap-1">
               <FloatLabel variant="in" class="">
-                <InputText name="username" type="text" fluid />
+                <InputText name="username" type="text" fluid v-model="initialValues.username" />
                 <label for="username">Имя пользователя</label>
               </FloatLabel>
               <Message v-if="$form.username?.invalid" severity="error" size="small" variant="simple">{{ $form.username.error.message }}</Message>
             </div>
             <div class="flex flex-col gap-1">
               <FloatLabel variant="in" class="">
-                <Password name="password" :feedback="false" toggleMask fluid />
+                <Password name="password" :feedback="false" toggleMask fluid v-model="initialValues.password" />
                 <label for="password">Пароль</label>
               </FloatLabel>
 
