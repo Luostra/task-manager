@@ -30,7 +30,7 @@ const { logout } = authStore
 <template>
   <Menubar
     :model="items"
-    class="!fixed !backdrop-blur-sm !bg-emerald-500/40 w-full h-auto z-10000 !border-0"
+    class="!fixed !backdrop-blur-sm !bg-emerald-500/40 w-full h-auto z-10000 !border-0 dark:!bg-emerald-700/40"
     :pt="{
       root: { class: '!flex !justify-between !gap-4' },
       rootList: { class: 'order-2 !ml-auto' },

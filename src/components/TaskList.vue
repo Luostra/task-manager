@@ -87,9 +87,9 @@ function update() {
             <div class="flex flex-wrap items-center gap-2">
               <Checkbox inputId="size_normal" name="size" value="Normal" v-model="todo.done" binary @change="update()" />
               <label for="size_normal" class="font-medium truncate max-w-80 text-sm md:text-base">{{ todo.name }}</label>
-              <div class="bg-surface-100 p-1" style="border-radius: 30px">
+              <div class="bg-surface-100 p-1 dark:bg-emerald-950" style="border-radius: 30px">
                 <div
-                  class="bg-surface-0 flex items-center gap-2 justify-center py-1 px-2"
+                  class="bg-surface-0 flex items-center gap-2 justify-center py-1 px-2 dark:bg-surface-900"
                   style="
                     border-radius: 30px;
                     box-shadow:
@@ -97,7 +97,7 @@ function update() {
                       0px 1px 2px 0px rgba(0, 0, 0, 0.06);
                   "
                 >
-                  <span class="text-surface-900 font-medium text-sm">{{ todo.rating }}</span>
+                  <span class="text-surface-900 font-medium text-sm dark:text-white">{{ todo.rating }}</span>
                   <i class="pi pi-star-fill text-emerald-500"></i>
                 </div>
               </div>

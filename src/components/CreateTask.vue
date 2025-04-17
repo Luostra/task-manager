@@ -47,7 +47,7 @@ const tags = ref([
 ])
 </script>
 <template>
-  <Form v-slot="$form" :resolver @submit="onFormSubmit" class="w-full p-3 flex flex-col border-1 gap-4 border-gray-200">
+  <Form v-slot="$form" :resolver @submit="onFormSubmit" class="w-full p-3 flex flex-col gap-4">
     <div class="flex flex-row gap-4">
       <FloatLabel variant="in" class="basis-3/5">
         <InputText name="newTask" id="new_task" type="text" class="w-full h-full" v-model="formData.name" />
