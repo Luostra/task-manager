@@ -4,6 +4,10 @@ import { Button, Menubar } from 'primevue'
 import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
+import { useThemeStore } from '@/stores/useTheme'
+
+const themeStore = useThemeStore()
+themeStore.initTheme()
 //    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
 const items = ref([
   {
@@ -42,6 +46,7 @@ const { logout } = authStore
   >
     <template #start>
       <img width="115" height="35" viewBox="0 0 115 35" fill="none" src="./assets/logoFull.png" class="" />
+      <Button @click="themeStore.toggleTheme" :icon="themeStore.isDarkTheme ? 'pi pi-sun' : 'pi pi-moon'" class="p-button-rounded p-button-text !text-gray-700 dark:!text-white" text />
     </template>
     <template #item="{ item, props }">
       <a class="flex items-center" v-bind="props.action">
