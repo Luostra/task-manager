@@ -71,7 +71,6 @@ const onFormSubmit = (e) => {
                 <Password name="password" :feedback="false" toggleMask fluid v-model="initialValues.password" />
                 <label for="password">Пароль</label>
               </FloatLabel>
-
               <Message v-if="$form.password?.invalid" severity="error" size="small" variant="simple">
                 <ul class="my-0 flex flex-col gap-1">
                   <li v-for="(error, index) of $form.password.errors" :key="index">
