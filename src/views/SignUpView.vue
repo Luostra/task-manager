@@ -56,8 +56,8 @@ const onFormSubmit = (e) => {
     <div class="flex-1 w-full bg-gray-500/20 dark:bg-black/85">
       <div class="w-full max-w-150 mx-auto min-h-min bg-white/85 backdrop-blur-sm rounded-lg mb-10 mt-30 shadow-xl dark:bg-surface-900/75">
         <div class="">
-          <h1 class="font-medium text-2xl text-gray-500 text-center pt-4">Регистрация нового аккаунта</h1>
-          <p class="font-medium text-sm text-gray-500 text-center pt-2">Создайте учётную запись, чтобы не потерять свой список дел:</p>
+          <h1 class="font-medium text-2xl text-gray-500 text-center pt-4">Регистрация</h1>
+          <p class="font-medium text-sm text-gray-500 text-center pt-2">Создайте аккаунт, чтобы не потерять свой список дел:</p>
           <Form v-slot="$form" :initialValues :resolver @submit="onFormSubmit" class="flex flex-col gap-4 w-full mx-auto max-w-148 p-4">
             <div class="flex flex-col gap-1">
               <FloatLabel variant="in" class="">

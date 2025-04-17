@@ -51,7 +51,7 @@ const onFormSubmit = async (e) => {
       <Toast class="pt-10" />
       <div class="w-full max-w-150 mx-auto min-h-min bg-white/85 backdrop-blur-sm rounded-lg mb-10 mt-30 shadow-xl dark:bg-surface-900/75">
         <div class="">
-          <h1 class="font-medium text-2xl text-gray-500 text-center pt-4">Вход в учётную запись</h1>
+          <h1 class="font-medium text-2xl text-gray-500 text-center pt-4">Вход</h1>
           <p class="font-medium text-sm text-gray-500 text-center pt-2">Войдите в аккаунт, чтобы вернуться к Вашим задачам:</p>
           <Form v-slot="$form" :initialValues :resolver @submit="onFormSubmit" class="flex flex-col gap-4 w-full mx-auto max-w-148 p-4">
             <div class="flex flex-col gap-1">

@@ -11,7 +11,7 @@ const authStore = useAuthStore()
 const { user } = storeToRefs(authStore)
 const items = user.value.items // Реактивная ссылка на массив
 
-let id = user.value.tasksId
+let id = user.value.tasksId + 1
 
 const addTodo = (value) => {
   console.log(id)
@@ -114,43 +114,6 @@ function update() {
           <template #icons>
             <Button icon="pi pi-trash" severity="danger" rounded text @click="removeTodo(todo)" />
             <Button icon="pi pi-pencil" rounded text @click="selectCard(todo)" />
-
-            <Dialog v-model:visible="isEditDialogVisible" modal header="Изменить задачу" :style="{ width: '25rem' }" pt:mask:class="backdrop-blur-sm backdrop-brightness-100" class="!max-h-155">
-              <span class="text-surface-500 dark:text-surface-400 block mb-8">Обновите информацию и закройте окно</span>
-              <div class="flex items-center gap-4 mb-4">
-                <FloatLabel variant="in" class="w-full">
-                  <InputText name="newTask" id="new_task" type="text" class="w-full h-full" v-model="selectedCard.name" :defaultValue="selectedCard.name" />
-                  <label for="new_task">Название задачи</label>
-                </FloatLabel>
-              </div>
-              <div class="flex items-center gap-4 mb-4">
-                <FloatLabel variant="in" class="w-full">
-                  <DatePicker v-model="selectedCard.time" :minDate="today" :manualInput="false" :defaultValue="selectedCard.time" showIcon iconDisplay="input" class="w-full" showButtonBar />
-                  <label for="date">Выполнить до</label>
-                </FloatLabel>
-              </div>
-              <div class="flex items-center gap-4 mb-4">
-                <FloatLabel variant="in" class="w-full">
-                  <MultiSelect id="tags" v-model="selectedCard.tags" :defaultValue="selectedCard.tags" :options="tags" optionLabel="name" filter :maxSelectedLabels="3" class="w-full" variant="filled" />
-                  <label for="tags">Теги</label>
-                </FloatLabel>
-              </div>
-              <div class="flex items-center gap-4 mb-4">
-                <div class="flex 1 mx-auto gap-2">
-                  <p class="text-sm md:text-base font-medium text-gray-500">Приоритет:</p>
-                  <Rating v-model="selectedCard.rating" :defaultValue="selectedCard.rating" />
-                </div>
-              </div>
-              <div class="flex items-center gap-4 mb-4">
-                <FloatLabel variant="on" class="w-full">
-                  <Textarea name="taskDescription" id="task_description" class="w-full" style="resize: none" rows="4" v-model="selectedCard.description" :defaultValue="selectedCard.description" />
-                  <label for="task_description">Описание</label>
-                </FloatLabel>
-              </div>
-              <div class="flex items-center gap-4 mb-4">
-                <Button label="Сохранить изменения" @click="replaceCardById(selectedCard.id, selectedCard)"></Button>
-              </div>
-            </Dialog>
             <Menu ref="menu" id="config_menu" popup />
           </template>
           <div class="flex flex-col gap-1">
@@ -170,5 +133,41 @@ function update() {
         </Panel>
       </li>
     </ul>
+    <Dialog v-model:visible="isEditDialogVisible" modal header="Изменить задачу" :style="{ width: '25rem' }" pt:mask:class="backdrop-blur-sm backdrop-brightness-100" class="!max-h-155">
+      <span class="text-surface-500 dark:text-surface-400 block mb-8">Обновите информацию и закройте окно</span>
+      <div class="flex items-center gap-4 mb-4">
+        <FloatLabel variant="in" class="w-full">
+          <InputText name="newTask" id="new_task" type="text" class="w-full h-full" v-model="selectedCard.name" :defaultValue="selectedCard.name" />
+          <label for="new_task">Название задачи</label>
+        </FloatLabel>
+      </div>
+      <div class="flex items-center gap-4 mb-4">
+        <FloatLabel variant="in" class="w-full">
+          <DatePicker v-model="selectedCard.time" :minDate="today" :manualInput="false" :defaultValue="selectedCard.time" showIcon iconDisplay="input" class="w-full" showButtonBar />
+          <label for="date">Выполнить до</label>
+        </FloatLabel>
+      </div>
+      <div class="flex items-center gap-4 mb-4">
+        <FloatLabel variant="in" class="w-full">
+          <MultiSelect id="tags" v-model="selectedCard.tags" :defaultValue="selectedCard.tags" :options="tags" optionLabel="name" filter :maxSelectedLabels="3" class="w-full" variant="filled" />
+          <label for="tags">Теги</label>
+        </FloatLabel>
+      </div>
+      <div class="flex items-center gap-4 mb-4">
+        <div class="flex 1 mx-auto gap-2">
+          <p class="text-sm md:text-base font-medium text-gray-500">Приоритет:</p>
+          <Rating v-model="selectedCard.rating" :defaultValue="selectedCard.rating" />
+        </div>
+      </div>
+      <div class="flex items-center gap-4 mb-4">
+        <FloatLabel variant="on" class="w-full">
+          <Textarea name="taskDescription" id="task_description" class="w-full" style="resize: none" rows="4" v-model="selectedCard.description" :defaultValue="selectedCard.description" />
+          <label for="task_description">Описание</label>
+        </FloatLabel>
+      </div>
+      <div class="flex items-center gap-4 mb-4">
+        <Button label="Сохранить изменения" @click="replaceCardById(selectedCard.id, selectedCard)"></Button>
+      </div>
+    </Dialog>
   </div>
 </template>

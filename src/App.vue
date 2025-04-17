@@ -45,8 +45,8 @@ const { logout } = authStore
     }"
   >
     <template #start>
-      <img width="115" height="35" viewBox="0 0 115 35" fill="none" src="./assets/logoFull.png" class="" />
-      <Button @click="themeStore.toggleTheme" :icon="themeStore.isDarkTheme ? 'pi pi-sun' : 'pi pi-moon'" class="p-button-rounded p-button-text !text-gray-700 dark:!text-white" text />
+      <img width="115" height="35" viewBox="0 0 115 35" src="./assets/logoFull.png" class="" />
+      <Button @click="themeStore.toggleTheme" :icon="themeStore.isDarkTheme ? 'pi pi-sun' : 'pi pi-moon'" class="ml-2 p-button-rounded p-button-text !text-gray-700 dark:!text-white" text />
     </template>
     <template #item="{ item, props }">
       <a class="flex items-center" v-bind="props.action">
