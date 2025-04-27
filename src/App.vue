@@ -34,7 +34,7 @@ const { logout } = authStore
 <template>
   <Menubar
     :model="items"
-    class="!fixed !backdrop-blur-sm !bg-emerald-500/40 w-full h-auto z-10000 !border-0 dark:!bg-emerald-700/40"
+    class="!fixed !backdrop-blur-sm !bg-emerald-500/40 w-full h-auto z-10000 !border-0 dark:!bg-emerald-500/40"
     :pt="{
       root: { class: '!flex !justify-between !gap-4' },
       rootList: { class: 'order-2 !ml-auto' },
@@ -46,7 +46,7 @@ const { logout } = authStore
   >
     <template #start>
       <img width="115" height="35" viewBox="0 0 115 35" src="./assets/logoFull.png" class="" />
-      <Button @click="themeStore.toggleTheme" :icon="themeStore.isDarkTheme ? 'pi pi-sun' : 'pi pi-moon'" class="ml-2 p-button-rounded p-button-text !text-gray-700 dark:!text-white" text />
+      <Button @click="themeStore.toggleTheme" :icon="themeStore.isDarkTheme ? 'pi pi-moon' : 'pi pi-sun'" class="ml-2 p-button-text !text-gray-700 dark:!text-white" text />
     </template>
     <template #item="{ item, props }">
       <a class="flex items-center" v-bind="props.action">

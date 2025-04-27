@@ -134,7 +134,7 @@ function update() {
       </li>
     </ul>
     <Dialog v-model:visible="isEditDialogVisible" modal header="Изменить задачу" :style="{ width: '25rem' }" pt:mask:class="backdrop-blur-sm backdrop-brightness-100" class="!max-h-155">
-      <span class="text-surface-500 dark:text-surface-400 block mb-8">Обновите информацию и закройте окно</span>
+      <span class="text-surface-500 dark:text-surface-400 block mb-8">Обновите информацию и подтвердите</span>
       <div class="flex items-center gap-4 mb-4">
         <FloatLabel variant="in" class="w-full">
           <InputText name="newTask" id="new_task" type="text" class="w-full h-full" v-model="selectedCard.name" :defaultValue="selectedCard.name" />
