@@ -5,7 +5,13 @@ import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import { useThemeStore } from '@/stores/useTheme'
+import { onMounted } from 'vue'
 
+const authStore = useAuthStore()
+
+onMounted(() => {
+  authStore.checkAuth()
+})
 const themeStore = useThemeStore()
 themeStore.initTheme()
 //    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
@@ -26,8 +32,7 @@ const items = ref([
     path: '/login',
   },
 ])
-const authStore = useAuthStore()
-const { isAuthenticated } = storeToRefs(authStore)
+
 const { logout } = authStore
 </script>
 
@@ -50,20 +55,20 @@ const { logout } = authStore
     </template>
     <template #item="{ item, props }">
       <a class="flex items-center" v-bind="props.action">
-        <RouterLink :to="item.path" v-if="isAuthenticated && item.label != 'Войти'">
+        <RouterLink :to="item.path" v-if="authStore.isAuthenticated && item.label != 'Войти'">
           <span :class="item.icon" />
           <span class="pl-1">{{ item.label }}</span>
         </RouterLink>
-        <RouterLink :to="item.path" v-if="!isAuthenticated && item.label == 'Войти'">
+        <RouterLink :to="item.path" v-if="!authStore.isAuthenticated && item.label == 'Войти'">
           <span :class="item.icon" />
           <span class="pl-1">{{ item.label }}</span>
         </RouterLink>
-        <RouterLink :to="item.path" v-if="!isAuthenticated && item.label == 'О программе'">
+        <RouterLink :to="item.path" v-if="!authStore.isAuthenticated && item.label == 'О программе'">
           <span :class="item.icon" />
           <span class="pl-1">{{ item.label }}</span>
         </RouterLink>
         <RouterLink to="/login">
-          <Button unstyled="" label="  Выйти" @click="logout" text icon="pi pi-sign-out" severity="danger" v-if="isAuthenticated && item.label == 'Войти'"></Button>
+          <Button unstyled="" label="  Выйти" @click="logout" text icon="pi pi-sign-out" severity="danger" v-if="authStore.isAuthenticated && item.label == 'Войти'"></Button>
         </RouterLink>
       </a>
     </template>

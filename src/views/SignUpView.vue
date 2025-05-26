@@ -13,8 +13,6 @@ const router = useRouter()
 const initialValues = ref({
   username: '',
   password: '',
-  items: [],
-  tasksId: 0,
 })
 
 const resolver = zodResolver(
@@ -36,7 +34,10 @@ const resolver = zodResolver(
   }),
 )
 
-const onFormSubmit = (e) => {
+const isLoading = ref(false)
+const error = ref(null)
+
+const onFormSubmit = async (e) => {
   // e.originalEvent: Represents the native form submit event.
   // e.valid: A boolean that indicates whether the form is valid or not.
   // e.states: Contains the current state of each form field, including validity status.
@@ -46,8 +47,16 @@ const onFormSubmit = (e) => {
 
   if (e.valid) {
     console.log(initialValues.value)
-    authStore.register(initialValues.value)
-    router.push('/')
+    try {
+      isLoading.value = true
+      error.value = null
+      await authStore.register(initialValues.value)
+      router.push('/')
+    } catch (err) {
+      error.value = authStore.error || 'Registration failed'
+    } finally {
+      isLoading.value = false
+    }
   }
 }
 </script>

@@ -23,18 +23,29 @@ const router = createRouter({
       path: '/login',
       name: 'log in',
       component: () => import('../views/LogInView.vue'),
+      meta: { requiresGuest: true },
     },
     {
       path: '/signUp',
       name: 'sign up',
       component: () => import('../views/SignUpView.vue'),
+      meta: { requiresGuest: true },
     },
   ],
 })
-router.beforeEach((to, from, next) => {
+
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next('/login')
+  
+  // Проверяем аутентификацию при первом посещении
+  if (!authStore.user && authStore.token) {
+    await authStore.checkAuth()
+  }
+
+  if (to.meta.requiresAuth && !authStore.token) {
+    next({ name: '/login' })
+  } else if (to.meta.requiresGuest && authStore.token) {
+    next({ name: '/home' })
   } else {
     next()
   }
