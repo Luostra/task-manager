@@ -90,7 +90,7 @@ import { Avatar } from 'primevue'
                 <i class="pi pi-database !text-2xl"></i>
               </div>
               <span class="text-2xl font-bold text-center">Ваши данные в безопасности</span>
-              <span class="text-center">Никто не украдёт Ваши данные из базы данных, которой нет 😎. Пока нет...</span>
+              <span class="text-center">Пароли надёжно зашифрованы</span>
             </div>
           </div>
           <div class="h-[30rem]"></div>

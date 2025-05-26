@@ -46,6 +46,7 @@ const onFormSubmit = async (e) => {
         router.push('/')
       }, 3005)
     } catch (err) {
+      toast.add({ severity: 'error', summary: 'Ошибка входа', detail: 'Проверьте корректность введённых данных', life: 3000 })
       error.value = authStore.error || 'Login failed'
     } finally {
       isLoading.value = false
