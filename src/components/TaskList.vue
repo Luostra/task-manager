@@ -155,6 +155,8 @@ const filteredTodos = computed(() => {
 onMounted(() => {
   fetchTasks()
 })
+
+const tag_colors = ['secondary', 'success', 'info', 'warn', 'danger', 'contrast']
 </script>
 
 <template>
@@ -204,7 +206,7 @@ onMounted(() => {
               <h1 class="font-medium text-gray-500">{{ todo.tags.length ? 'Теги:' : '' }}</h1>
               <ul class="flex flex-row gap-2">
                 <li v-for="tag in todo.tags" :key="tag">
-                  <Tag severity="info" rounded>{{ tag }}</Tag>
+                  <Tag :severity="tag_colors[tags.indexOf(tag, 0)]" rounded>{{ tag }}</Tag>
                 </li>
               </ul>
             </div>
