@@ -1,79 +1,164 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import CreateTask from '@/components/CreateTask.vue'
 import { Panel, Button, ToggleButton, Checkbox, Menu, Tag, Dialog, InputText, Message, Textarea, FloatLabel, DatePicker, MultiSelect, Rating } from 'primevue'
-import { format } from 'date-fns'
-import { z } from 'zod'
+import { format, formatISO } from 'date-fns'
 import { useAuthStore } from '@/stores/auth'
-import { storeToRefs } from 'pinia'
+import axios from 'axios'
 
 const authStore = useAuthStore()
-const { user } = storeToRefs(authStore)
-const items = user.value.items // Реактивная ссылка на массив
+const API_URL = 'http://localhost:3000/api'
 
-let id = user.value.tasksId + 1
-
-const addTodo = (value) => {
-  console.log(id)
-  todos.value.push({
-    id: id++,
-    name: value.name,
-    description: value.description,
-    time: value.date,
-    rating: value.rating,
-    tags: value.tags,
-    done: false,
-  })
-  authStore.replaceItems(todos.value)
-  console.log(id)
-  value = ''
-}
-
+// Состояния
 const hideCompleted = ref(false)
-const todos = ref(items)
+const todos = ref([])
+const isEditDialogVisible = ref(false)
+const selectedCard = ref(null)
+const tags = ref(['Работа', 'Учёба', 'Повседневное', 'Личное', 'Путешествия', 'Другое'])
 
-const filteredTodos = computed(() => {
-  return hideCompleted.value ? todos.value.filter((t) => !t.done) : todos.value
-})
-
-function removeTodo(todo) {
-  todos.value = todos.value.filter((t) => t !== todo)
-  authStore.replaceItems(todos.value)
+// Получение задач с сервера
+const fetchTasks = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/tasks`, {
+      headers: {
+        'x-auth-token': authStore.token,
+      },
+    })
+    todos.value = response.data.map((task) => ({
+      id: task.id,
+      name: task.title,
+      description: task.description,
+      time: task.deadline ? new Date(task.deadline) : null,
+      rating: task.rating || 0,
+      tags: task.tags || [],
+      done: task.is_completed,
+    }))
+  } catch (error) {
+    console.error('Ошибка при загрузке задач:', error)
+  }
 }
 
-const isEditDialogVisible = ref(false)
+// Добавление новой задачи
+const addTodo = async (value) => {
+  try {
+    // Преобразуем Date объект в строку ISO без временной зоны
+    const deadline = value.date ? formatISO(value.date, { representation: 'complete' }).slice(0, 19) : null
+    const response = await axios.post(
+      `${API_URL}/tasks`,
+      {
+        title: value.name,
+        description: value.description,
+        rating: value.rating,
+        deadline: deadline,
+        tags: value.tags,
+      },
+      {
+        headers: {
+          'x-auth-token': authStore.token,
+        },
+      },
+    )
 
-let today = new Date()
-const tags = ref([
-  { name: 'Работа', color: 'secondary' },
-  { name: 'Учёба', color: 'success' },
-  { name: 'Повседневное', color: 'info' },
-  { name: 'Личное', color: 'warn' },
-  { name: 'Путешествия', color: 'danger' },
-  { name: 'Другое', color: 'contrast' },
-])
-const selectedCard = ref(null)
+    todos.value.push({
+      id: response.data.id,
+      name: response.data.title,
+      description: response.data.description,
+      time: response.data.deadline ? new Date(response.data.deadline) : null,
+      rating: response.data.rating || 0,
+      tags: response.data.tags || [],
+      done: response.data.is_completed,
+    })
+  } catch (error) {
+    console.error('Ошибка при создании задачи:', error)
+  }
+}
+
+// Удаление задачи
+const removeTodo = async (todo) => {
+  try {
+    await axios.delete(`${API_URL}/tasks/${todo.id}`, {
+      headers: {
+        'x-auth-token': authStore.token,
+      },
+    })
+    todos.value = todos.value.filter((t) => t.id !== todo.id)
+  } catch (error) {
+    console.error('Ошибка при удалении задачи:', error)
+  }
+}
+
+// Обновление задачи
+const updateTask = async (task) => {
+  try {
+    const deadline = task.time ? formatISO(task.time, { representation: 'complete' }).slice(0, 19) : null
+    await axios.put(
+      `${API_URL}/tasks/${task.id}`,
+      {
+        title: task.name,
+        description: task.description,
+        is_completed: task.done,
+        rating: task.rating,
+        deadline: deadline,
+        tags: task.tags,
+      },
+      {
+        headers: {
+          'x-auth-token': authStore.token,
+        },
+      },
+    )
+    console.log({
+      title: task.name,
+      description: task.description,
+      is_completed: task.done,
+      rating: task.rating,
+      deadline: task.time,
+      tags: task.tags,
+    })
+    const index = todos.value.findIndex((t) => t.id === task.id)
+    if (index !== -1) {
+      todos.value[index] = task
+    }
+  } catch (error) {
+    console.error('Ошибка при обновлении задачи:', error)
+  }
+}
+
+// Переключение статуса выполнения
+const toggleComplete = async (todo) => {
+  //todo.done = !todo.done
+  await updateTask(todo)
+}
+
+// Выбор задачи для редактирования
 const selectCard = (card) => {
   isEditDialogVisible.value = true
-  selectedCard.value = card
+  selectedCard.value = { ...card }
 }
 
-const replaceCardById = (id, newCard) => {
-  const index = todos.value.findIndex((card) => card.id === id)
-  if (index !== -1) {
-    if (newCard.rating == null) {
-      newCard.rating = 0
-    }
-    todos.value[index] = newCard
-    authStore.replaceItems(todos.value)
+// Сохранение изменений
+const saveChanges = async () => {
+  if (selectedCard.value) {
+    await updateTask(selectedCard.value)
     isEditDialogVisible.value = false
   }
 }
 
-function update() {
-  authStore.replaceItems(todos.value)
-}
+let today = new Date()
+
+// Фильтрация задач
+const filteredTodos = computed(() => {
+  return hideCompleted.value ? todos.value.filter((t) => !t.done) : todos.value
+})
+
+// Загрузка задач при монтировании компонента
+onMounted(() => {
+  fetchTasks()
+})
+
+const tag_colors = ['secondary', 'success', 'info', 'warn', 'danger', 'contrast']
 </script>
+
 <template>
   <CreateTask @form-submited="addTodo" />
   <div class="flex flex-col">
@@ -85,7 +170,7 @@ function update() {
         <Panel toggleable :collapsed="true">
           <template #header>
             <div class="flex flex-wrap items-center gap-2">
-              <Checkbox inputId="size_normal" name="size" value="Normal" v-model="todo.done" binary @change="update()" />
+              <Checkbox inputId="size_normal" name="size" value="Normal" v-model="todo.done" binary @change="toggleComplete(todo)" />
               <label for="size_normal" class="font-medium truncate max-w-80 text-sm md:text-base">{{ todo.name }}</label>
               <div class="bg-surface-100 p-1 dark:bg-emerald-950" style="border-radius: 30px">
                 <div
@@ -102,7 +187,7 @@ function update() {
                 </div>
               </div>
               <p class="font-medium text-gray-500">
-                {{ todo.time == undefined ? '' : 'До ' + format(todo.time, 'dd.MM.yyyy') }}
+                {{ !todo.time ? '' : 'До ' + format(todo.time, 'dd.MM.yyyy') }}
               </p>
             </div>
           </template>
@@ -118,10 +203,10 @@ function update() {
           </template>
           <div class="flex flex-col gap-1">
             <div class="flex flex-row gap-2">
-              <h1 class="font-medium text-gray-500">{{ todo.tags ? 'Теги:' : '' }}</h1>
+              <h1 class="font-medium text-gray-500">{{ todo.tags.length ? 'Теги:' : '' }}</h1>
               <ul class="flex flex-row gap-2">
-                <li v-for="tag in todo.tags">
-                  <Tag :severity="tag.color" rounded>{{ tag.name }}</Tag>
+                <li v-for="tag in todo.tags" :key="tag">
+                  <Tag :severity="tag_colors[tags.indexOf(tag, 0)]" rounded>{{ tag }}</Tag>
                 </li>
               </ul>
             </div>
@@ -134,39 +219,39 @@ function update() {
       </li>
     </ul>
     <Dialog v-model:visible="isEditDialogVisible" modal header="Изменить задачу" :style="{ width: '25rem' }" pt:mask:class="backdrop-blur-sm backdrop-brightness-100" class="!max-h-155">
-      <span class="text-surface-500 dark:text-surface-400 block mb-8">Обновите информацию и закройте окно</span>
+      <span class="text-surface-500 dark:text-surface-400 block mb-8">Обновите информацию и подтвердите</span>
       <div class="flex items-center gap-4 mb-4">
         <FloatLabel variant="in" class="w-full">
-          <InputText name="newTask" id="new_task" type="text" class="w-full h-full" v-model="selectedCard.name" :defaultValue="selectedCard.name" />
+          <InputText name="newTask" id="new_task" type="text" class="w-full h-full" v-model="selectedCard.name" />
           <label for="new_task">Название задачи</label>
         </FloatLabel>
       </div>
       <div class="flex items-center gap-4 mb-4">
         <FloatLabel variant="in" class="w-full">
-          <DatePicker v-model="selectedCard.time" :minDate="today" :manualInput="false" :defaultValue="selectedCard.time" showIcon iconDisplay="input" class="w-full" showButtonBar />
+          <DatePicker v-model="selectedCard.time" :manualInput="false" :minDate="today" showIcon iconDisplay="input" class="w-full" showButtonBar dateFormat="dd.mm.yy" :showTime="true" hourFormat="24" />
           <label for="date">Выполнить до</label>
         </FloatLabel>
       </div>
       <div class="flex items-center gap-4 mb-4">
         <FloatLabel variant="in" class="w-full">
-          <MultiSelect id="tags" v-model="selectedCard.tags" :defaultValue="selectedCard.tags" :options="tags" optionLabel="name" filter :maxSelectedLabels="3" class="w-full" variant="filled" />
+          <MultiSelect id="tags" v-model="selectedCard.tags" :options="tags" filter :maxSelectedLabels="3" class="w-full" variant="filled" />
           <label for="tags">Теги</label>
         </FloatLabel>
       </div>
       <div class="flex items-center gap-4 mb-4">
         <div class="flex 1 mx-auto gap-2">
           <p class="text-sm md:text-base font-medium text-gray-500">Приоритет:</p>
-          <Rating v-model="selectedCard.rating" :defaultValue="selectedCard.rating" />
+          <Rating v-model="selectedCard.rating" :cancel="false" />
         </div>
       </div>
       <div class="flex items-center gap-4 mb-4">
         <FloatLabel variant="on" class="w-full">
-          <Textarea name="taskDescription" id="task_description" class="w-full" style="resize: none" rows="4" v-model="selectedCard.description" :defaultValue="selectedCard.description" />
+          <Textarea name="taskDescription" id="task_description" class="w-full" style="resize: none" rows="4" v-model="selectedCard.description" />
           <label for="task_description">Описание</label>
         </FloatLabel>
       </div>
       <div class="flex items-center gap-4 mb-4">
-        <Button label="Сохранить изменения" @click="replaceCardById(selectedCard.id, selectedCard)"></Button>
+        <Button label="Сохранить изменения" @click="saveChanges"></Button>
       </div>
     </Dialog>
   </div>

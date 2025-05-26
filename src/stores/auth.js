@@ -1,70 +1,92 @@
-import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import axios from 'axios'
+import { jwtDecode } from 'jwt-decode'
 
-export const useAuthStore = defineStore('auth', () => {
-  // Состояние
-  const user = ref(JSON.parse(localStorage.getItem('user')) || { 
-    items: [],
-    tasksId: 0 // Добавляем поле для хранения максимального ID
-  })
-  const isAuthenticated = computed(() => !!user.value)
-
-  // Действия
-  const register = (userData) => {
-    const newUser = {
-      id: Date.now(),
-      items: [],  // Добавляем пустой массив при регистрации
-      ...userData
+export const useAuthStore = defineStore('auth', {
+  state: () => ({
+    user: null,
+    token: null,
+    isLoading: false,
+    error: null
+  }),
+  getters: {
+    // Добавляем геттер для проверки аутентификации
+    isAuthenticated(state) {
+      // Проверяем наличие токена и пользователя
+      if (!state.token || !state.user) return false
+      
+      // Дополнительно можно проверить срок действия токена
+      try {
+        const decoded = jwtDecode(state.token)
+        if (decoded.exp && decoded.exp < Date.now() / 1000) {
+          return false
+        }
+        return true
+      } catch {
+        return false
+      }
     }
-    user.value = newUser
-    saveUser()
-  }
-  const login = (credentials) => {
-    // В реальном приложении здесь была бы проверка с сервером
-    // Для демо просто проверяем наличие пользователя в localStorage
-    const storedUser = JSON.parse(localStorage.getItem('user'))
-    if (storedUser && storedUser.username === credentials.username && storedUser.password === credentials.password) {
-      user.value = storedUser
-      return true
-    }
-    return false
-  }
+  },
+  actions: {
+    async register(credentials) {
+      this.isLoading = true
+      this.error = null
+      try {
+        const response = await axios.post('http://localhost:3000/api/auth/register', credentials)
+        this.token = response.data.token
+        this.decodeAndSetUser()
+        localStorage.setItem('token', this.token)
+      } catch (err) {
+        this.error = err.response?.data?.message || 'Registration failed'
+        throw err
+      } finally {
+        this.isLoading = false
+      }
+    },
 
-  const logout = () => {
-    user.value = null
-    //localStorage.removeItem('user')
-  }
+    async login(credentials) {
+      this.isLoading = true
+      this.error = null
+      try {
+        const response = await axios.post('http://localhost:3000/api/auth/login', credentials)
+        this.token = response.data.token
+        this.decodeAndSetUser()
+        localStorage.setItem('token', this.token)
+      } catch (err) {
+        this.error = err.response?.data?.message || 'Login failed'
+        throw err
+      } finally {
+        this.isLoading = false
+      }
+    },
 
-  const saveUser = () => {
-    localStorage.setItem('user', JSON.stringify(user.value))
-  }
-  
-  const replaceItems = (newArray) => { // добавить обновление id
-    if (!Array.isArray(newArray)) {
-      console.error('Метод replaceItems ожидает массив в качестве аргумента')
-      return
-    }
-  
-    // Обновляем массив items
-    user.value.items = [...newArray]
-  
-    // Вычисляем новый maxId
-    if (newArray.length === 0) {
-      user.value.tasksId = 0 // Если массив пуст, сбрасываем maxId
-    } else {
-      // Находим максимальный ID среди всех элементов
-      user.value.tasksId = Math.max(...newArray.map(item => item?.id ?? 0))
-    }
-  
-    saveUser() // Сохраняем изменени
-  }
+    decodeAndSetUser() {
+      if (this.token) {
+        try {
+          const decoded = jwtDecode(this.token)
+          this.user = {
+            username: decoded.username || decoded.sub
+          }
+        } catch (err) {
+          console.error('Failed to decode token', err)
+          this.user = null
+        }
+      }
+    },
 
-  return {
-    user,
-    isAuthenticated,
-    register,
-    login,
-    logout,
-    replaceItems,
-  }
+    logout() {
+      this.token = null
+      this.user = null
+      localStorage.removeItem('token')
+    },
+
+    async checkAuth() {
+      const token = localStorage.getItem('token')
+      if (token) {
+        this.token = token
+        this.decodeAndSetUser()
+      }
+    }
+  },
+  persist: true
 })

@@ -10,8 +10,11 @@ import { useToast } from 'primevue/usetoast'
 import Toast from 'primevue/toast'
 const toast = useToast()
 
-const authStore = useAuthStore()
 const router = useRouter()
+const authStore = useAuthStore()
+
+const isLoading = ref(false)
+const error = ref(null)
 
 const initialValues = ref({
   username: '',
@@ -32,16 +35,27 @@ const onFormSubmit = async (e) => {
   // e.errors: An object that holds any validation errors for the invalid fields in the form.
   // e.values: An object containing the current values of all form fields.
   // e.reset: A function that resets the form to its initial state.
-  const success = authStore.login(initialValues.value)
-  if (e.valid && success) {
-    console.log(initialValues.value)
-    toast.add({ severity: 'success', summary: 'Вход осуществлён', detail: 'Вы вошли как ' + initialValues.value.username, life: 3000 })
-    setTimeout(function () {
-      router.push('/')
-    }, 3005)
+  if (e.valid) {
+    try {
+      isLoading.value = true
+      error.value = null
+      await authStore.login(initialValues.value)
+      console.log(initialValues.value)
+      toast.add({ severity: 'success', summary: 'Вход осуществлён', detail: 'Вы вошли как ' + initialValues.value.username, life: 3000 })
+      setTimeout(function () {
+        router.push('/')
+      }, 3005)
+    } catch (err) {
+      toast.add({ severity: 'error', summary: 'Ошибка входа', detail: 'Проверьте корректность введённых данных', life: 3000 })
+      error.value = authStore.error || 'Login failed'
+    } finally {
+      isLoading.value = false
+    }
   } else {
     toast.add({ severity: 'error', summary: 'Ошибка входа', detail: 'Пользователь не найден', life: 3000 })
     console.log('error')
+    error.value = authStore.error || 'Login failed'
+    isLoading.value = false
   }
 }
 </script>

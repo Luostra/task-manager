@@ -36,7 +36,7 @@ const onFormSubmit = ({ valid }) => {
     formData.value = { ...initialFormData }
   }
 }
-
+/*
 const tags = ref([
   { name: 'Работа', color: 'secondary' },
   { name: 'Учёба', color: 'success' },
@@ -44,7 +44,8 @@ const tags = ref([
   { name: 'Личное', color: 'warn' },
   { name: 'Путешествия', color: 'danger' },
   { name: 'Другое', color: 'contrast' },
-])
+])*/
+const tags = ref(['Работа', 'Учёба', 'Повседневное', 'Личное', 'Путешествия', 'Другое'])
 </script>
 <template>
   <Form v-slot="$form" :resolver @submit="onFormSubmit" class="w-full p-3 flex flex-col gap-4">
@@ -61,7 +62,7 @@ const tags = ref([
     <Message v-if="$form.newTask?.invalid" severity="error" size="small" variant="simple" class="-mt-4">{{ $form.newTask.error?.message }}</Message>
     <div class="flex flex-row gap-4">
       <FloatLabel variant="in" class="basis-3/4">
-        <MultiSelect id="tags" v-model="formData.tags" :options="tags" optionLabel="name" filter :maxSelectedLabels="3" class="w-35 md:w-full" variant="filled" />
+        <MultiSelect id="tags" v-model="formData.tags" :options="tags" filter :maxSelectedLabels="3" class="w-35 md:w-full" variant="filled" />
         <label for="tags">Теги</label>
       </FloatLabel>
       <div class="basis-1/4 flex flex-row">
