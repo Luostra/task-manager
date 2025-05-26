@@ -42,12 +42,12 @@ router.beforeEach(async (to, from, next) => {
     await authStore.checkAuth()
   }
 
-  if (to.meta.requiresAuth && !authStore.token) {
-    next({ name: '/login' })
-  } else if (to.meta.requiresGuest && authStore.token) {
-    next({ name: '/home' })
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    next('/login')
+  } else if (to.meta.requiresGuest && authStore.isAuthenticated) {
+    next('/')
   } else {
     next()
-  }
+  } 
 })
 export default router
