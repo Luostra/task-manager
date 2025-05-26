@@ -6,6 +6,9 @@ import { Button, InputText, Password, Message, FloatLabel } from 'primevue'
 import { Form } from '@primevue/forms'
 import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from 'primevue/usetoast'
+import Toast from 'primevue/toast'
+const toast = useToast()
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -17,7 +20,7 @@ const initialValues = ref({
 
 const resolver = zodResolver(
   z.object({
-    username: z.string().min(5, { message: 'Введите имя пользователя (минимум 5 символов)' }),
+    username: z.string().min(5, { message: 'Введите имя пользователя (минимум 5 символов)' }).max(30, { message: 'Максимум 30 символов' }),
     password: z
       .string()
       .min(6, { message: 'Минимум 6 символов' })
@@ -51,8 +54,12 @@ const onFormSubmit = async (e) => {
       isLoading.value = true
       error.value = null
       await authStore.register(initialValues.value)
-      router.push('/')
+      toast.add({ severity: 'success', summary: 'Вход осуществлён', detail: 'Приветствуем, ' + initialValues.value.username + '!', life: 3000 })
+      setTimeout(function () {
+        router.push('/')
+      }, 3005)
     } catch (err) {
+      toast.add({ severity: 'error', summary: 'Ошибка входа', detail: 'Пользователь с таким именем уже существует', life: 3000 })
       error.value = authStore.error || 'Registration failed'
     } finally {
       isLoading.value = false
@@ -63,6 +70,7 @@ const onFormSubmit = async (e) => {
 <template>
   <div class="flex flex-col bg-[url('../assets/patternCode.jpg')] bg-[length:65%_auto] lg:bg-[length:25%_auto] bg-repeat w-full min-h-lvh h-full dark:bg-[url('../assets/patternBlack.jpg')]">
     <div class="flex-1 w-full bg-gray-500/20 dark:bg-black/85">
+      <Toast class="pt-10" />
       <div class="w-full max-w-150 mx-auto min-h-min bg-white/85 backdrop-blur-sm rounded-lg mb-10 mt-30 shadow-xl dark:bg-surface-900/75">
         <div class="">
           <h1 class="font-medium text-2xl text-gray-500 text-center pt-4">Регистрация</h1>
